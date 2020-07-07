@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>AIGames</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+</head>
+
+<body>
+  <div style="align-content: center;">
+    <h1 id="Title">Welcome to AIGames!</h1>
+    
+  </div>
+  <div id="TOC">
+    <a href='/connect4'>Connect 4</a>
+    <a href='/othello'>Othello</a>
+    <a href='/tictactoe'>Tic-Tac-Toe</a>
+  </div>
+
+  <div id = "Game">
+    {% block header %}{% endblock %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+
+</html>
