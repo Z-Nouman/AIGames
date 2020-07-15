@@ -1,44 +1,3 @@
-from flask import Flask
-from flask import render_template, request, jsonify, make_response
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return render_template("index.html")
-
-@app.route('/connect4')
-def connect4():
-    return render_template("Connect4.html")
-
-@app.route('/connect4/AIResponse', methods=["POST"])
-def connect4Bot():
-    req = request.get_json()
-    print(req)
-    req = make_response(jsonify({"message": "Received"}), 200)
-    return req
-
-@app.route('/othello')
-def othello():
-    return render_template("Othello.html")
-
-@app.route('/tictactoe')
-def tictactoe():
-    return render_template("TicTacToe.html")
-
-@app.route('/tictactoe/AIResponse', methods=["POST"])
-def tictactoeBot():
-    req = request.get_json()
-    game = req['message']
-    if game.count(0) == 9:
-        answer = (0, False)
-    else:
-        answer = playGame(game)
-    req = make_response(jsonify({"endGame": answer[1], "player": answer[0]}), 200)
-    return req
-
-if __name__ == "__main__":
-    app.run()
-
 decision = None
 def maximize(board, playerNum):
     if endGame(board):
@@ -147,22 +106,20 @@ def utility(board):
     else:
         return 0
 
+def printGame(board):
+    print(str(board[2]) + " " + str(board[5]) + " " + str(board[8]))
+    print(str(board[1]) + " " + str(board[4]) + " " + str(board[7]))
+    print(str(board[0]) + " " + str(board[3]) + " " + str(board[6]))
+    print ("----------------------")
 
 def playGame(board):
-    if board.count(0) == 9:
-        return (0, False)
-    if checkVictory(board, -1):
-        return (-1, True)
-    elif (endGame(board)):
-        return (-2, True)
-    final = maximize(board, 1)[1]
-    board[final] = 1
-    if checkVictory(board, 1):
-        return (final, True)
-    elif (endGame(board)):
-        return (-2, True)
-    else:
-        return (final, False)
-    
-
+    while not endGame(board):
+        printGame(board)
+        playerMove = int(input("Enter an index here >>> "))
+        board[playerMove] = -1
+        printGame(board)
+        final = maximize(board, 1)[1]
+        board[final] = 1
         
+game = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+playGame(game)

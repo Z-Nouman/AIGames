@@ -4,5 +4,166 @@
 {% endblock %}
 
 {% block content %}
-  <p>Welcome to TicTacToe!</p>
+<div class="grid-container">
+  <div class="grid-item" id='2' onmouseover="mouseHover('2')" onmouseout="out('2')" onclick = "placeToken('2')"> </div>
+  <div class="grid-item" id='5' onmouseover="mouseHover('5')" onmouseout="out('5')" onclick = "placeToken('5')"> </div>
+  <div class="grid-item" id='8' onmouseover="mouseHover('8')" onmouseout="out('8')" onclick = "placeToken('8')"> </div>  
+  <div class="grid-item" id='1' onmouseover="mouseHover('1')" onmouseout="out('1')" onclick = "placeToken('1')"> </div>
+  <div class="grid-item" id='4' onmouseover="mouseHover('4')" onmouseout="out('4')" onclick = "placeToken('4')"> </div>
+  <div class="grid-item" id='7' onmouseover="mouseHover('7')" onmouseout="out('7')" onclick = "placeToken('7')"> </div>  
+  <div class="grid-item" id='0' onmouseover="mouseHover('0')" onmouseout="out('0')" onclick = "placeToken('0')"> </div>
+  <div class="grid-item" id='3' onmouseover="mouseHover('3')" onmouseout="out('3')" onclick = "placeToken('3')"> </div>
+  <div class="grid-item" id='6' onmouseover="mouseHover('6')" onmouseout="out('6')" onclick = "placeToken('6')"> </div>  
+</div>
+<div>
+  <p id ="TTTOrder">It is Red's Turn!</p>
+</div>
+<button id='resetTTTGame' onclick="resetBoard()">Reset</button>
+
+
+<script>
+  var array = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+  var XTurn = true;
+  var starting = 1;
+  var gameOver = false;
+
+  function resetBoard(){
+    var i;
+    gameOver = false;
+    for (i = 0; i < 9; i++){
+      document.getElementById(i.toString()).innerHTML = ' ';
+      array[i] = 0;
+    }
+    starting += 1;
+      if (starting % 2 == 0){
+        XTurn = false;
+        document.getElementById('TTTOrder').innerHTML = 'It is Yellow\'s turn!';
+        AIResponse();
+      }
+      else{
+        XTurn = true;
+        document.getElementById('TTTOrder').innerHTML = 'It is Red\'s turn!';
+      }
+  }
+
+  function mouseHover(id) {
+      if (gameOver){
+        return;
+      }
+      var name = id.toString()
+      if (document.getElementById(name.toString()).innerHTML != ' '){
+        return;
+      }
+      if (XTurn){
+        shape = 'X';
+        color = 'lightpink';
+      }
+      else{
+        return;
+      }
+      document.getElementById(name.toString()).innerHTML = shape;
+      document.getElementById(name.toString()).style.color = color;
+  }
+  
+  function out(id){
+    if (gameOver){
+      return;
+    }
+    var name = id.toString()
+    if (document.getElementById(name.toString()).style.color == 'red' || document.getElementById(name.toString()).style.color == 'yellow' ){
+      return;
+    }
+    document.getElementById(name.toString()).style.color = 'lightblue';
+    document.getElementById(name.toString()).innerHTML = ' ';
+  }
+
+  function preventCheating(){
+    var x;
+    for (x = 0; x < 9; x++){
+      document.getElementById(x.toString()).style.pointerEvents = 'none';
+    }
+  }
+
+  function reenableAction(){
+    var x;
+    for (x = 0; x < 9; x++){
+      document.getElementById(x.toString()).style.pointerEvents = 'auto';
+    }
+  }
+
+  function placeToken(id){
+      if (gameOver){
+        return;
+      }
+      var name = id.toString()
+
+      var num = parseInt(name);
+      if (XTurn){
+        color = 'red';
+        XTurn = false;
+        shape = 'X';
+        array[num] = -1
+        document.getElementById('TTTOrder').innerHTML = 'It is Yellow\'s turn!';
+        preventCheating();
+        AIResponse();
+      }
+      else{
+        color = 'yellow';
+        XTurn = true;
+        shape = 'O'
+        array[num] = 1
+        document.getElementById('TTTOrder').innerHTML = 'It is Red\'s turn!';
+        
+      }
+      document.getElementById(name.toString()).style.color = color;
+      document.getElementById(name.toString()).innerHTML = shape;
+  }
+
+  function AIResponse(){
+    var entry = {
+      message: array
+    };
+    fetch(window.origin.toString() + '/tictactoe/AIResponse', {
+      method: "POST",
+      credentials: "omit",
+      body: JSON.stringify(entry),
+      cache: "no-cache",
+      headers: new Headers({
+        "content-type": "application/json"
+      })
+    })
+    .then(function (response){
+      if (response.status !== 200){
+        console.log('Response was not 200: ${response.status}');
+      }
+      response.json().then(function (data){
+        if (data.endGame){
+          if (data.player == -1){
+            document.getElementById('TTTOrder').innerHTML = "Congratulations! Red (The player) has won!!";
+          }
+          else if (data.player == -2){
+            var j;
+            for (j = 0; j < 9; j++){
+              if (array[j] == 0){
+                placeToken(j);
+                reenableAction();
+              }
+            }
+            document.getElementById('TTTOrder').innerHTML = "Close game! It's a draw!";
+          }
+          else{
+            placeToken(data.player);
+            reenableAction();
+            document.getElementById('TTTOrder').innerHTML = "Sorry, yellow (the computer) has won";
+          }
+          gameOver = true;
+        }
+        else{
+          placeToken(data.player);
+          reenableAction();
+        }
+      })
+    })
+  }
+  </script>
 {% endblock %}
