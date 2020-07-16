@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template, request, jsonify, make_response
 from connect4 import *
-from intro import *
+from tictactoe import *
 app = Flask(__name__)
 
 @app.route('/')
