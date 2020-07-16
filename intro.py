@@ -106,20 +106,18 @@ def utility(board):
     else:
         return 0
 
-def printGame(board):
-    print(str(board[2]) + " " + str(board[5]) + " " + str(board[8]))
-    print(str(board[1]) + " " + str(board[4]) + " " + str(board[7]))
-    print(str(board[0]) + " " + str(board[3]) + " " + str(board[6]))
-    print ("----------------------")
-
 def playGame(board):
-    while not endGame(board):
-        printGame(board)
-        playerMove = int(input("Enter an index here >>> "))
-        board[playerMove] = -1
-        printGame(board)
-        final = maximize(board, 1)[1]
-        board[final] = 1
-        
-game = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-playGame(game)
+    if board.count(0) == 9:
+        return (0, False)
+    if checkVictory(board, -1):
+        return (-1, True)
+    elif (endGame(board)):
+        return (-2, True)
+    final = maximize(board, 1)[1]
+    board[final] = 1
+    if checkVictory(board, 1):
+        return (final, True)
+    elif (endGame(board)):
+        return (-2, True)
+    else:
+        return (final, False)
